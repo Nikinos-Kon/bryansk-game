@@ -7,10 +7,8 @@ import { useCurrency } from '../context/CurrencyContext';
 import { 
   Search, 
   ShoppingCart, 
-  Bell, 
   Wallet, 
   Settings, 
-  Globe, 
   Sun, 
   Moon, 
   Gamepad2, 
@@ -30,16 +28,14 @@ export function Navbar({
   onOpenCart, 
   onOpenAuth, 
   onNavigate,
-  activePage,
   onOpenFilterModal
 }) {
   const { user, logout } = useAuth();
   const { cart } = useCart();
-  const { lang, setLang, t } = useLang();
+  const { t } = useLang();
   const { theme, changeTheme } = useTheme();
   const { currency, switchCurrency, formatPrice } = useCurrency();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
   const toggleNextTheme = () => {
     if (theme === THEMES.DARK) changeTheme(THEMES.LIGHT);
@@ -78,10 +74,10 @@ export function Navbar({
           </div>
         </div>
 
-        {/* Center Search Bar with Filter Integration */}
-        <div className="flex-1 max-w-xl mx-4 hidden md:block">
+        {/* Center Search Bar with Filter Integration (Expanded width so placeholder fits fully) */}
+        <div className="flex-1 max-w-2xl mx-4 hidden md:block">
           <div className="relative flex items-center">
-            <div className="absolute left-3.5 text-theme-muted pointer-events-none">
+            <div className="absolute left-4 text-theme-muted pointer-events-none">
               <Search size={18} />
             </div>
             <input
@@ -89,7 +85,7 @@ export function Navbar({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-10 pr-24 py-2.5 rounded-full bg-theme-card border border-theme-border text-sm text-theme-text placeholder-theme-muted focus:outline-none focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 transition-all shadow-inner"
+              className="w-full pl-11 pr-28 py-2.5 rounded-full bg-theme-card border border-theme-border text-sm text-theme-text placeholder-theme-muted focus:outline-none focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 transition-all shadow-inner"
             />
             {onOpenFilterModal && (
               <button
@@ -125,34 +121,6 @@ export function Navbar({
           >
             {getThemeIcon()}
           </button>
-
-          {/* Language Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="p-2 rounded-lg bg-theme-card hover:bg-theme-border border border-theme-border text-theme-text flex items-center gap-1 text-xs font-semibold uppercase transition-all"
-              title="Выбор языка"
-            >
-              <Globe size={16} />
-              <span>{lang}</span>
-            </button>
-            {langDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-28 rounded-xl bg-theme-surface border border-theme-border shadow-2xl py-1 z-50">
-                <button
-                  onClick={() => { setLang('ru'); setLangDropdownOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs font-medium flex items-center justify-between hover:bg-theme-card transition-colors ${lang === 'ru' ? 'text-theme-primary font-bold' : 'text-theme-text'}`}
-                >
-                  <span>🇷🇺 Русский</span>
-                </button>
-                <button
-                  onClick={() => { setLang('en'); setLangDropdownOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs font-medium flex items-center justify-between hover:bg-theme-card transition-colors ${lang === 'en' ? 'text-theme-primary font-bold' : 'text-theme-text'}`}
-                >
-                  <span>🇬🇧 English</span>
-                </button>
-              </div>
-            )}
-          </div>
 
           {/* Wallet Balance Pill */}
           {user && (

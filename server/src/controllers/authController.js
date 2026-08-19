@@ -22,11 +22,11 @@ export function register(req, res) {
     const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(nickname)}`;
 
     db.prepare(`
-      INSERT INTO users (id, email, passwordHash, nickname, avatar, role, bio, level, walletBalance, currency, theme, lang)
-      VALUES (?, ?, ?, ?, ?, 'USER', 'Новый игрок на Bryansk_game', 1, 3000.0, 'RUB', 'dark', 'ru')
+      INSERT INTO users (id, email, passwordHash, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance, currency, theme, lang)
+      VALUES (?, ?, ?, ?, ?, 'USER', 'Новый игрок на Bryansk_game', 'В сети и готов к игре', 'default', 'default', 1, 3000.0, 'RUB', 'dark', 'ru')
     `).run(id, email, passwordHash, nickname, defaultAvatar);
 
-    const user = db.prepare('SELECT id, email, nickname, avatar, role, bio, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(id);
+    const user = db.prepare('SELECT id, email, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(id);
 
     const token = jwt.sign({ userId: user.id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
 
@@ -68,6 +68,9 @@ export function login(req, res) {
       avatar: user.avatar,
       role: user.role,
       bio: user.bio,
+      customStatus: user.customStatus || 'В сети и готов к игре',
+      profileFrame: user.profileFrame || 'default',
+      profileBackground: user.profileBackground || 'default',
       level: user.level,
       walletBalance: user.walletBalance,
       currency: user.currency,
@@ -88,7 +91,7 @@ export function login(req, res) {
 
 export function getMe(req, res) {
   try {
-    const user = db.prepare('SELECT id, email, nickname, avatar, role, bio, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(req.user.id);
+    const user = db.prepare('SELECT id, email, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(req.user.id);
     
     // Count user's library games and wishlist
     const gamesCount = db.prepare('SELECT COUNT(*) as count FROM library_items WHERE userId = ?').get(req.user.id).count;
@@ -111,7 +114,7 @@ export function getMe(req, res) {
 
 export function updatePreferences(req, res) {
   try {
-    const { theme, lang, currency, bio, nickname, avatar } = req.body;
+    const { theme, lang, currency, bio, nickname, avatar, customStatus, profileFrame, profileBackground } = req.body;
     const current = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
 
     const newTheme = theme || current.theme;
@@ -120,14 +123,17 @@ export function updatePreferences(req, res) {
     const newBio = bio !== undefined ? bio : current.bio;
     const newNickname = nickname || current.nickname;
     const newAvatar = avatar || current.avatar;
+    const newCustomStatus = customStatus !== undefined ? customStatus : (current.customStatus || 'В сети и готов к игре');
+    const newProfileFrame = profileFrame !== undefined ? profileFrame : (current.profileFrame || 'default');
+    const newProfileBackground = profileBackground !== undefined ? profileBackground : (current.profileBackground || 'default');
 
     db.prepare(`
       UPDATE users 
-      SET theme = ?, lang = ?, currency = ?, bio = ?, nickname = ?, avatar = ?, updatedAt = datetime('now')
+      SET theme = ?, lang = ?, currency = ?, bio = ?, nickname = ?, avatar = ?, customStatus = ?, profileFrame = ?, profileBackground = ?, updatedAt = datetime('now')
       WHERE id = ?
-    `).run(newTheme, newLang, newCurrency, newBio, newNickname, newAvatar, req.user.id);
+    `).run(newTheme, newLang, newCurrency, newBio, newNickname, newAvatar, newCustomStatus, newProfileFrame, newProfileBackground, req.user.id);
 
-    const updatedUser = db.prepare('SELECT id, email, nickname, avatar, role, bio, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(req.user.id);
+    const updatedUser = db.prepare('SELECT id, email, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(req.user.id);
 
     return res.json({
       message: 'Настройки успешно сохранены',

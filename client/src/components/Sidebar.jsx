@@ -4,16 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { 
   Store, 
   Gamepad2, 
-  Trophy, 
   Heart, 
   Users, 
-  Wallet, 
-  Settings, 
+  Globe,
   ShieldCheck
 } from 'lucide-react';
 
-export function Sidebar({ activePage, onNavigate, onOpenWallet, onOpenSettings }) {
-  const { t } = useLang();
+export function Sidebar({ activePage, onNavigate }) {
+  const { lang, setLang, t } = useLang();
   const { user } = useAuth();
 
   const navItems = [
@@ -23,10 +21,14 @@ export function Sidebar({ activePage, onNavigate, onOpenWallet, onOpenSettings }
     { id: 'friends', icon: Users, label: t('friends') },
   ];
 
+  const toggleLanguage = () => {
+    setLang(lang === 'ru' ? 'en' : 'ru');
+  };
+
   return (
     <aside className="w-18 md:w-20 fixed left-0 top-20 bottom-0 z-30 bg-theme-surface/70 backdrop-blur-xl border-r border-theme-border flex flex-col items-center justify-between py-6 transition-colors duration-300">
       
-      {/* Top Nav Icons */}
+      {/* Top Navigation Icons */}
       <div className="flex flex-col items-center gap-3 w-full px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -70,27 +72,21 @@ export function Sidebar({ activePage, onNavigate, onOpenWallet, onOpenSettings }
         )}
       </div>
 
-      {/* Bottom Shortcuts */}
+      {/* Bottom Language Switcher Button (Replaced wallet and settings) */}
       <div className="flex flex-col items-center gap-3 w-full px-2">
         <button
-          onClick={onOpenWallet}
-          className="group relative flex items-center justify-center w-12 h-12 rounded-2xl text-emerald-400 hover:bg-emerald-500/15 transition-all"
-          title={t('wallet')}
+          onClick={toggleLanguage}
+          className="group relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-theme-card/70 hover:bg-theme-card border border-theme-border text-theme-text hover:border-theme-primary/50 transition-all shadow-sm"
+          title={`Язык: ${lang === 'ru' ? 'Русский (RU)' : 'English (EG)'} (нажмите для смены)`}
         >
-          <Wallet size={21} className="transition-transform group-hover:scale-110" />
-          <div className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-theme-card border border-theme-border text-emerald-400 text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl z-50">
-            {t('wallet')}
-          </div>
-        </button>
+          <Globe size={18} className="text-theme-primary transition-transform group-hover:rotate-45" />
+          <span className="text-[10px] font-black text-theme-text mt-0.5 tracking-wider uppercase">
+            {lang === 'ru' ? 'RU' : 'EG'}
+          </span>
 
-        <button
-          onClick={onOpenSettings}
-          className="group relative flex items-center justify-center w-12 h-12 rounded-2xl text-theme-muted hover:text-theme-text hover:bg-theme-card transition-all"
-          title={t('settings')}
-        >
-          <Settings size={21} className="transition-transform group-hover:rotate-45" />
+          {/* Tooltip */}
           <div className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-theme-card border border-theme-border text-theme-text text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl z-50">
-            {t('settings')}
+            {lang === 'ru' ? '🇷🇺 Русский (RU)' : '🇬🇧 English (EG)'}
           </div>
         </button>
       </div>

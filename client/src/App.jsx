@@ -133,6 +133,7 @@ export function App() {
           items={checkoutItems}
           onClose={() => setCheckoutItems(null)}
           onSuccess={() => setActivePage('library')}
+          onOpenWallet={() => setIsWalletOpen(true)}
         />
       )}
 

@@ -210,7 +210,7 @@ export function WalletModal({ onClose }) {
                 }`}
               >
                 <CreditCard size={20} />
-                <span>Карта РФ</span>
+                <span>Карта VISA/Mastercard</span>
               </button>
 
               <button

@@ -31,6 +31,9 @@ export function initDatabase() {
       avatar TEXT,
       role TEXT DEFAULT 'USER',
       bio TEXT DEFAULT 'Геймер из Брянска',
+      customStatus TEXT DEFAULT 'В сети и готов к игре',
+      profileFrame TEXT DEFAULT 'default',
+      profileBackground TEXT DEFAULT 'default',
       level INTEGER DEFAULT 1,
       walletBalance REAL DEFAULT 5000.0,
       currency TEXT DEFAULT 'RUB',
@@ -140,6 +143,11 @@ export function initDatabase() {
     );
   `);
 
+  // Safe migration for columns if table existed prior
+  try { db.exec("ALTER TABLE users ADD COLUMN customStatus TEXT DEFAULT 'В сети и готов к игре'"); } catch (e) {}
+  try { db.exec("ALTER TABLE users ADD COLUMN profileFrame TEXT DEFAULT 'default'"); } catch (e) {}
+  try { db.exec("ALTER TABLE users ADD COLUMN profileBackground TEXT DEFAULT 'default'"); } catch (e) {}
+
   // Always sync/upsert games catalog with full official Steam games data
   console.log(`Syncing ${SEED_GAMES.length} real games with official Steam artwork...`);
   const upsertGame = db.prepare(`
@@ -211,9 +219,9 @@ export function initDatabase() {
     console.log('Seeding default users and test accounts...');
     const insertUser = db.prepare(`
       INSERT INTO users (
-        id, email, passwordHash, nickname, avatar, role, bio, level, walletBalance
+        id, email, passwordHash, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance
       ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?, 'В сети и готов к игре', 'default', 'default', ?, ?
       )
     `);
 

@@ -4,20 +4,18 @@ import crypto from 'crypto';
 export function checkout(req, res) {
   try {
     const userId = req.user.id;
-    const { paymentMethod, items: directItems } = req.body; 
-    // paymentMethod: 'SBP', 'VISA_MC', 'USDT', 'WALLET'
-
-    if (!paymentMethod) {
-      return res.status(400).json({ error: 'Выберите способ оплаты' });
-    }
+    const { paymentMethod = 'WALLET', items: directItems } = req.body; 
 
     let gamesToPurchase = [];
 
     if (directItems && Array.isArray(directItems) && directItems.length > 0) {
       // Direct checkout for specific game(s)
       for (const item of directItems) {
-        const game = db.prepare('SELECT * FROM games WHERE id = ?').get(item.gameId || item.id);
-        if (game) gamesToPurchase.push(game);
+        const gameId = typeof item === 'string' ? item : (item.gameId || item.id);
+        if (gameId) {
+          const game = db.prepare('SELECT * FROM games WHERE id = ?').get(String(gameId));
+          if (game) gamesToPurchase.push(game);
+        }
       }
     } else {
       // Checkout all items from user's cart
@@ -45,14 +43,12 @@ export function checkout(req, res) {
       totalUsd += finalUsd;
     }
 
-    // Check user balance if paying with internal wallet
+    // Check user balance for internal wallet
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-    if (paymentMethod === 'WALLET') {
-      if (user.walletBalance < totalRub) {
-        return res.status(400).json({
-          error: `Недостаточно средств на кошельке. Требуется ${Math.round(totalRub)} ₽, у вас ${Math.round(user.walletBalance)} ₽.`
-        });
-      }
+    if ((user.walletBalance || 0) < totalRub) {
+      return res.status(400).json({
+        error: `Недостаточно средств на кошельке. Требуется ${Math.round(totalRub)} ₽, у вас ${Math.round(user.walletBalance || 0)} ₽.`
+      });
     }
 
     // Execute atomic transaction for purchasing
@@ -61,11 +57,9 @@ export function checkout(req, res) {
     try {
       db.exec('BEGIN TRANSACTION');
 
-      // 1. Deduct balance if WALLET
-      if (paymentMethod === 'WALLET') {
-        const newBalance = user.walletBalance - totalRub;
-        db.prepare('UPDATE users SET walletBalance = ? WHERE id = ?').run(newBalance, userId);
-      }
+      // 1. Deduct balance
+      const newBalance = (user.walletBalance || 0) - totalRub;
+      db.prepare('UPDATE users SET walletBalance = ? WHERE id = ?').run(newBalance, userId);
 
       // 2. Add games to library
       const insertLib = db.prepare(`
@@ -85,9 +79,9 @@ export function checkout(req, res) {
       // 3. Create transaction log
       db.prepare(`
         INSERT INTO transactions (id, userId, type, paymentMethod, amountRub, amountUsd, status, details, createdAt)
-        VALUES (?, ?, 'PURCHASE', ?, ?, ?, 'COMPLETED', ?, datetime('now'))
+        VALUES (?, ?, 'PURCHASE', 'WALLET', ?, ?, 'COMPLETED', ?, datetime('now'))
       `).run(
-        txId, userId, paymentMethod, totalRub, totalUsd,
+        txId, userId, totalRub, totalUsd,
         JSON.stringify(gamesToPurchase.map(g => ({ id: g.id, title: g.title, priceRub: g.priceRub })))
       );
 
@@ -97,7 +91,7 @@ export function checkout(req, res) {
       throw txErr;
     }
 
-    const updatedUser = db.prepare('SELECT id, email, nickname, avatar, role, bio, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(userId);
+    const updatedUser = db.prepare('SELECT id, email, nickname, avatar, role, bio, customStatus, profileFrame, profileBackground, level, walletBalance, currency, theme, lang FROM users WHERE id = ?').get(userId);
 
     return res.status(200).json({
       message: 'Оплата успешно завершена! Игры добавлены в вашу библиотеку.',
