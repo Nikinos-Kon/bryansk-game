@@ -31,8 +31,9 @@ export function FilterBar({
   const { currency, formatPrice } = useCurrency();
 
   const getCategoryLabel = (cat) => {
-    if (cat === 'All') return t('allCategories');
-    return cat;
+    const key = 'cat_' + cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const translated = t(key);
+    return translated && translated !== key ? translated : cat;
   };
 
   const hasActiveFilters = selectedCategory !== 'All' || sortBy !== 'popular' || minPrice || maxPrice;

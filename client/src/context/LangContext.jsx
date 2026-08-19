@@ -36,8 +36,21 @@ const translations = {
     reviewsCount: 'отзывов',
     rating: 'Оценка',
     
-    // Filters & Sorting
+    // Filters & Sorting & Categories
     categories: 'Категории',
+    cat_all: 'Все игры',
+    cat_action: 'Экшен',
+    cat_rpg: 'РПГ',
+    cat_strategy: 'Стратегии',
+    cat_competitive: 'Соревновательные',
+    cat_tactical: 'Тактические',
+    cat_cyberpunk: 'Киберпанк',
+    cat_racing: 'Гонки',
+    cat_openworld: 'Открытый мир',
+    cat_soulslike: 'Соулслайк',
+    cat_shooter: 'Шутеры',
+    cat_adventure: 'Приключения',
+    cat_sports: 'Спорт',
     filterByPrice: 'Цена',
     sortBy: 'Сортировка',
     sortPopular: 'По популярности',
@@ -47,6 +60,29 @@ const translations = {
     sortNewest: 'Сначала новые',
     sortDiscount: 'По размеру скидки',
     clearFilters: 'Сбросить фильтры',
+    
+    // Store & Catalog
+    gameCatalog: 'Каталог игр',
+    foundGames: 'Найдено',
+    noGamesFound: 'Игры не найдены',
+    noGamesFoundDesc: 'Попробуйте изменить параметры поиска или сбросить фильтры.',
+    publisherPanel: 'Панель издателя',
+    support: 'Поддержка',
+    supportDesc: 'Мы онлайн 24/7',
+    supportPlaceholder: 'Написать сообщение...',
+    currencyLabel: 'Валюта',
+    walletDesc: 'Управление средствами и валютой',
+    topUpAmountLabel: 'Сумма пополнения (в рублях):',
+    loadingTransactions: 'Загрузка транзакций...',
+    topUpBtnText: 'Пополнить на',
+    
+    // Admin & Moderation & Dev
+    customerComplaints: 'Жалобы клиентов',
+    complaintsDesc: 'Модерация обращений и блокировка нарушителей',
+    banAccount: 'Заблокировать аккаунт',
+    bannedAccountBadge: 'Заблокирован',
+    devReset: 'Режим разработчика / сброс макета',
+    devResetSuccess: 'Макет успешно сброшен к исходным значениям!',
     
     // Game Modal / Details
     releaseDate: 'Дата выхода',
@@ -175,8 +211,21 @@ const translations = {
     reviewsCount: 'reviews',
     rating: 'Rating',
     
-    // Filters & Sorting
+    // Filters & Sorting & Categories
     categories: 'Categories',
+    cat_all: 'All Games',
+    cat_action: 'Action',
+    cat_rpg: 'RPG',
+    cat_strategy: 'Strategy',
+    cat_competitive: 'Competitive',
+    cat_tactical: 'Tactical',
+    cat_cyberpunk: 'Cyberpunk',
+    cat_racing: 'Racing',
+    cat_openworld: 'Open World',
+    cat_soulslike: 'Souls-like',
+    cat_shooter: 'Shooter',
+    cat_adventure: 'Adventure',
+    cat_sports: 'Sports',
     filterByPrice: 'Price',
     sortBy: 'Sort By',
     sortPopular: 'Most Popular',
@@ -186,6 +235,29 @@ const translations = {
     sortNewest: 'Newest Releases',
     sortDiscount: 'Highest Discount',
     clearFilters: 'Reset Filters',
+    
+    // Store & Catalog
+    gameCatalog: 'Game Catalog',
+    foundGames: 'Found',
+    noGamesFound: 'No games found',
+    noGamesFoundDesc: 'Try changing search criteria or reset filters.',
+    publisherPanel: 'Publisher Panel',
+    support: 'Support',
+    supportDesc: 'Online 24/7',
+    supportPlaceholder: 'Type a message...',
+    currencyLabel: 'Currency',
+    walletDesc: 'Manage funds and currency',
+    topUpAmountLabel: 'Top up amount (in RUB):',
+    loadingTransactions: 'Loading transactions...',
+    topUpBtnText: 'Top up',
+    
+    // Admin & Moderation & Dev
+    customerComplaints: 'Customer Complaints',
+    complaintsDesc: 'Moderation of tickets and player bans',
+    banAccount: 'Ban Account',
+    bannedAccountBadge: 'Banned',
+    devReset: 'Dev Mode / Reset Layout',
+    devResetSuccess: 'Layout successfully reset to initial seed values!',
     
     // Game Modal / Details
     releaseDate: 'Release Date',

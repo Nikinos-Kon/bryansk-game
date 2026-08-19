@@ -11,6 +11,7 @@ import * as profileController from '../controllers/profileController.js';
 import * as friendsController from '../controllers/friendsController.js';
 import * as reviewsController from '../controllers/reviewsController.js';
 import * as walletController from '../controllers/walletController.js';
+import * as devController from '../controllers/devController.js';
 
 const router = express.Router();
 
@@ -23,9 +24,9 @@ router.put('/auth/preferences', authenticateToken, authController.updatePreferen
 // --- GAMES CATALOG ---
 router.get('/games', optionalAuthenticateToken, gamesController.getGames);
 router.get('/games/:id', optionalAuthenticateToken, gamesController.getGameById);
-router.post('/games', authenticateToken, requireRole('ADMIN', 'PUBLISHER'), gamesController.createGame);
-router.put('/games/:id', authenticateToken, requireRole('ADMIN', 'PUBLISHER'), gamesController.updateGame);
-router.delete('/games/:id', authenticateToken, requireRole('ADMIN'), gamesController.deleteGame);
+router.post('/games', authenticateToken, requireRole('PUBLISHER'), gamesController.createGame);
+router.put('/games/:id', authenticateToken, requireRole('PUBLISHER'), gamesController.updateGame);
+router.delete('/games/:id', authenticateToken, requireRole('PUBLISHER', 'ADMIN'), gamesController.deleteGame);
 
 // --- CART ---
 router.get('/cart', authenticateToken, cartController.getCart);
@@ -60,5 +61,8 @@ router.get('/profile/:userId', optionalAuthenticateToken, profileController.getP
 router.get('/friends', authenticateToken, friendsController.getFriends);
 router.post('/friends/add', authenticateToken, friendsController.addFriend);
 router.delete('/friends/:friendId', authenticateToken, friendsController.removeFriend);
+
+// --- DEV & LAYOUT RESET ---
+router.post('/dev/reset', devController.resetLayout);
 
 export default router;

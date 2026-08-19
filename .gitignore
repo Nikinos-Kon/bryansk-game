@@ -29,7 +29,14 @@ dist-ssr
 
 # Database
 *.db
+*.db-*
 *.db-journal
-dev.db
-dev.db-journal
+*.db-shm
+*.db-wal
+dev.db*
+server/dev.db*
 prisma/*.db
+
+# Non game documents
+НЕ ИГРОВОЙ ФАЙЛ/
+"НЕ ИГРОВОЙ ФАЙЛ/"

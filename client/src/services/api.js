@@ -80,5 +80,8 @@ export const api = {
   // Friends
   getFriends: () => request('/friends'),
   addFriend: (targetUserId) => request('/friends/add', { method: 'POST', body: JSON.stringify({ targetUserId }) }),
-  removeFriend: (friendId) => request(`/friends/${friendId}`, { method: 'DELETE' })
+  removeFriend: (friendId) => request(`/friends/${friendId}`, { method: 'DELETE' }),
+
+  // Dev & Reset Layout
+  resetLayout: () => request('/dev/reset', { method: 'POST' })
 };

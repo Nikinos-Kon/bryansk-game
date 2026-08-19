@@ -4,6 +4,8 @@ import { useCart } from '../context/CartContext';
 import { useLang } from '../context/LangContext';
 import { useTheme, THEMES } from '../context/ThemeContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useNotification } from '../context/NotificationContext';
+import { api } from '../services/api';
 import { 
   Search, 
   ShoppingCart, 
@@ -17,7 +19,8 @@ import {
   Sparkles,
   User as UserIcon,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  RotateCcw
 } from 'lucide-react';
 
 export function Navbar({ 
@@ -30,12 +33,45 @@ export function Navbar({
   onNavigate,
   onOpenFilterModal
 }) {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const { cart } = useCart();
   const { t } = useLang();
   const { theme, changeTheme } = useTheme();
   const { currency, switchCurrency, formatPrice } = useCurrency();
+  const { addToast } = useNotification();
+
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleDevReset = async () => {
+    if (!confirm('Сбросить макет до исходного состояния?\n\n• Из библиотек удалятся купленные во время тестов игры\n• Часы игры и прогресс вернутся к стартовым\n• Кастомизация профиля сбросится до стандартной')) {
+      return;
+    }
+
+    try {
+      setIsResetting(true);
+      const res = await api.resetLayout();
+      addToast({
+        title: 'Макет сброшен',
+        message: res.message || 'Библиотеки и кастомизация возвращены к начальным значениям!',
+        icon: '🔄',
+        type: 'success'
+      });
+      await refreshUser();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err) {
+      addToast({
+        title: 'Ошибка сброса',
+        message: err.message,
+        icon: '❌',
+        type: 'error'
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const toggleNextTheme = () => {
     if (theme === THEMES.DARK) changeTheme(THEMES.LIGHT);
@@ -225,7 +261,11 @@ export function Navbar({
                   )}
                   <div className="border-t border-theme-border mt-1"></div>
                   <button
-                    onClick={() => { logout(); setUserDropdownOpen(false); }}
+                    onClick={() => { 
+                      logout(); 
+                      onNavigate('store');
+                      setUserDropdownOpen(false); 
+                    }}
                     className="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                   >
                     <LogOut size={16} />
@@ -243,6 +283,18 @@ export function Navbar({
               <span>{t('login')}</span>
             </button>
           )}
+
+          {/* Dev Mode / Reset Layout Button (To the right of profile) */}
+          <button
+            onClick={handleDevReset}
+            disabled={isResetting}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 hover:border-rose-500/60 text-rose-400 hover:text-rose-300 text-xs font-bold transition-all shadow-sm group active:scale-95 disabled:opacity-50"
+            title={t('devReset')}
+          >
+            <RotateCcw size={15} className={`text-rose-400 transition-transform duration-500 ${isResetting ? 'animate-spin' : 'group-hover:-rotate-90'}`} />
+            <span className="hidden xl:inline whitespace-nowrap">{t('devReset')}</span>
+            <span className="xl:hidden whitespace-nowrap">{t('devReset')}</span>
+          </button>
 
         </div>
 

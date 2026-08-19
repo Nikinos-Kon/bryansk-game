@@ -7,10 +7,11 @@ import {
   Heart, 
   Users, 
   Globe,
-  ShieldCheck
+  ShieldCheck,
+  MessageSquare
 } from 'lucide-react';
 
-export function Sidebar({ activePage, onNavigate }) {
+export function Sidebar({ activePage, onNavigate, onOpenSupport }) {
   const { lang, setLang, t } = useLang();
   const { user } = useAuth();
 
@@ -54,7 +55,7 @@ export function Sidebar({ activePage, onNavigate }) {
           );
         })}
 
-        {user?.role === 'ADMIN' && (
+        {user?.role === 'PUBLISHER' && (
           <button
             onClick={() => onNavigate('admin')}
             className={`group relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
@@ -62,18 +63,27 @@ export function Sidebar({ activePage, onNavigate }) {
                 ? 'bg-amber-500 text-white shadow-lg scale-105'
                 : 'text-amber-400 hover:bg-amber-500/10'
             }`}
-            title={t('admin')}
+            title={t('publisherPanel')}
           >
             <ShieldCheck size={22} className="transition-transform group-hover:scale-110" />
             <div className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-theme-card border border-theme-border text-amber-400 text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl z-50">
-              {t('admin')}
+              {t('publisherPanel')}
             </div>
           </button>
         )}
       </div>
 
-      {/* Bottom Language Switcher Button (Replaced wallet and settings) */}
       <div className="flex flex-col items-center gap-3 w-full px-2">
+        <button
+          onClick={onOpenSupport}
+          className="group relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 transition-all duration-300 shadow-sm"
+          title={t('support')}
+        >
+          <MessageSquare size={20} className="transition-transform group-hover:scale-110" />
+          <div className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-theme-card border border-theme-border text-indigo-400 text-xs font-semibold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl z-50">
+            {t('support')}
+          </div>
+        </button>
         <button
           onClick={toggleLanguage}
           className="group relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-theme-card/70 hover:bg-theme-card border border-theme-border text-theme-text hover:border-theme-primary/50 transition-all shadow-sm"

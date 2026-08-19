@@ -221,7 +221,7 @@ export function ProfilePage({ onSelectGame }) {
 
         {/* Customization / Profile Editor Form */}
         {isEditing && (
-          <form onSubmit={handleSaveProfile} className="mt-6 pt-6 border-t border-theme-border/70 space-y-5 animate-in slide-in-from-top-3">
+          <form onSubmit={handleSaveProfile} className="relative z-10 mt-6 pt-6 border-t border-theme-border/70 space-y-5 animate-in slide-in-from-top-3">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {/* Nickname */}

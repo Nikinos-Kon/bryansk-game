@@ -24,6 +24,7 @@ export function WalletModal({ onClose }) {
   const { user, refreshUser } = useAuth();
   const { addToast } = useNotification();
 
+  const [balance, setBalance] = useState(user?.walletBalance ?? 0);
   const [topUpAmount, setTopUpAmount] = useState(1000);
   const [selectedMethod, setSelectedMethod] = useState('SBP'); // 'SBP', 'VISA_MC', 'USDT'
   const [transactions, setTransactions] = useState([]);
@@ -36,6 +37,9 @@ export function WalletModal({ onClose }) {
     try {
       setLoadingTx(true);
       const data = await api.getWallet();
+      if (data && data.walletBalance !== undefined && data.walletBalance !== null) {
+        setBalance(data.walletBalance);
+      }
       setTransactions(data.transactions || []);
     } catch (err) {
       console.error(err);
@@ -45,8 +49,15 @@ export function WalletModal({ onClose }) {
   };
 
   useEffect(() => {
+    refreshUser();
     fetchWalletData();
   }, []);
+
+  useEffect(() => {
+    if (user?.walletBalance !== undefined && user?.walletBalance !== null) {
+      setBalance(user.walletBalance);
+    }
+  }, [user?.walletBalance]);
 
   const handleTopUp = async () => {
     if (!topUpAmount || topUpAmount <= 0) {
@@ -97,6 +108,8 @@ export function WalletModal({ onClose }) {
     }
   };
 
+  const displayBalance = Number(balance !== undefined && balance !== null ? balance : (user?.walletBalance ?? 0));
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
       
@@ -110,7 +123,7 @@ export function WalletModal({ onClose }) {
             </div>
             <div>
               <h3 className="font-extrabold text-lg tracking-tight">{t('walletTitle')}</h3>
-              <p className="text-xs text-theme-muted">Управление средствами и валютой</p>
+              <p className="text-xs text-theme-muted">{t('walletDesc')}</p>
             </div>
           </div>
           <button
@@ -123,28 +136,33 @@ export function WalletModal({ onClose }) {
 
         <div className="p-6 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
           
-          {/* Balance Card with Currency Switcher */}
-          <div className="relative p-6 rounded-3xl bg-gradient-to-br from-theme-card via-theme-surface to-theme-card border border-theme-border overflow-hidden shadow-lg flex flex-col justify-between gap-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t('currentBalance')}</span>
-                <h2 className="text-3xl font-black text-emerald-400 mt-1">
-                  {formatPrice(user?.walletBalance || 0)}
-                </h2>
-                <p className="text-xs text-theme-muted mt-0.5">
-                  ≈ {currency === 'RUB' ? `$${Number(((user?.walletBalance || 0) * 0.0125).toFixed(2))} USD` : `${Math.round(user?.walletBalance || 0)} ₽ RUB`}
+          {/* Balance Card with Currency Switcher (Expanded & Spacious) */}
+          <div className="relative min-h-[140px] w-full p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-theme-card via-theme-surface to-theme-card border-2 border-theme-border/80 shadow-xl flex flex-col justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1.5 flex-1">
+                <span className="text-xs font-bold text-theme-muted uppercase tracking-widest block">
+                  {t('currentBalance')}
+                </span>
+                <div className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight leading-none py-1">
+                  {currency === 'RUB' ? `${Math.round(displayBalance)} ₽` : `$${(displayBalance * 0.0125).toFixed(2)}`}
+                </div>
+                <p className="text-xs text-theme-muted font-semibold mt-1">
+                  ≈ {currency === 'RUB' ? `$${(displayBalance * 0.0125).toFixed(2)} USD` : `${Math.round(displayBalance)} ₽ RUB`}
                 </p>
               </div>
 
               {/* In-Wallet Currency Switcher Button */}
-              <button
-                onClick={handleToggleCurrency}
-                className="px-3 py-2 rounded-xl bg-theme-surface hover:bg-theme-primary/20 border border-theme-border text-xs font-bold text-theme-text flex items-center gap-1.5 shadow-sm transition-all"
-                title="Сменить валюту магазина"
-              >
-                <RefreshCw size={14} className="text-theme-primary" />
-                <span>Валюта: <strong className="text-theme-primary">{currency}</strong></span>
-              </button>
+              <div className="flex-shrink-0 self-start sm:self-center">
+                <button
+                  type="button"
+                  onClick={handleToggleCurrency}
+                  className="px-4 py-2.5 rounded-2xl bg-theme-surface hover:bg-theme-primary/20 border border-theme-border text-xs font-bold text-theme-text flex items-center gap-2 shadow-md transition-all active:scale-95"
+                  title={t('switchCurrency')}
+                >
+                  <RefreshCw size={15} className="text-theme-primary" />
+                  <span>{t('currencyLabel')}: <strong className="text-theme-primary font-black">{currency}</strong></span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -175,7 +193,7 @@ export function WalletModal({ onClose }) {
 
             {/* Custom Amount Input */}
             <div>
-              <label className="text-[11px] text-theme-muted font-bold block mb-1">Сумма пополнения (в рублях):</label>
+              <label className="text-[11px] text-theme-muted font-bold block mb-1">{t('topUpAmountLabel')}</label>
               <input
                 type="number"
                 value={topUpAmount}
@@ -210,7 +228,7 @@ export function WalletModal({ onClose }) {
                 }`}
               >
                 <CreditCard size={20} />
-                <span>Карта VISA/Mastercard</span>
+                <span>VISA / Mastercard</span>
               </button>
 
               <button
@@ -232,7 +250,7 @@ export function WalletModal({ onClose }) {
               disabled={loading}
               className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
             >
-              {loading ? 'Пополнение...' : `Пополнить на ${topUpAmount} ₽`}
+              {loading ? '...' : `${t('topUpBtnText')} ${topUpAmount} ₽`}
             </button>
           </div>
 
@@ -244,7 +262,7 @@ export function WalletModal({ onClose }) {
             </h4>
 
             {loadingTx ? (
-              <p className="text-xs text-theme-muted">Загрузка транзакций...</p>
+              <p className="text-xs text-theme-muted">{t('loadingTransactions')}</p>
             ) : transactions.length === 0 ? (
               <p className="text-xs text-theme-muted italic">{t('noTransactions')}</p>
             ) : (
@@ -259,7 +277,7 @@ export function WalletModal({ onClose }) {
                       </div>
                       <div>
                         <p className="font-bold text-theme-text">
-                          {tx.type === 'TOPUP' ? 'Пополнение баланса' : 'Покупка игр'}
+                          {tx.type === 'TOPUP' ? (lang === 'ru' ? 'Пополнение баланса' : 'Balance Top-Up') : (lang === 'ru' ? 'Покупка игр' : 'Game Purchase')}
                         </p>
                         <p className="text-[10px] text-theme-muted">{tx.paymentMethod} • {tx.createdAt}</p>
                       </div>

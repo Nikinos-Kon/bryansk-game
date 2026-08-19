@@ -79,10 +79,10 @@ export function StorePage({ searchQuery, onSelectGame, onBuyDirect }) {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-black text-theme-text uppercase tracking-tight flex items-center gap-2">
             <Compass size={20} className="text-theme-primary" />
-            <span>Каталог игр</span>
+            <span>{t('gameCatalog')}</span>
           </h2>
           <span className="text-xs text-theme-muted font-bold">
-            Найдено: {games.length}
+            {t('foundGames')}: {games.length}
           </span>
         </div>
 
@@ -109,13 +109,13 @@ export function StorePage({ searchQuery, onSelectGame, onBuyDirect }) {
       ) : games.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-theme-card border border-theme-border text-theme-muted space-y-3">
           <Search size={36} className="mx-auto text-theme-muted/40" />
-          <h3 className="font-bold text-base text-theme-text">Игры не найдены</h3>
-          <p className="text-xs">Попробуйте изменить параметры поиска или сбросить фильтры.</p>
+          <h3 className="font-bold text-base text-theme-text">{t('noGamesFound')}</h3>
+          <p className="text-xs">{t('noGamesFoundDesc')}</p>
           <button
             onClick={handleResetFilters}
             className="px-4 py-2 rounded-xl bg-theme-primary text-white text-xs font-bold shadow-glow-primary"
           >
-            Сбросить фильтры
+            {t('clearFilters')}
           </button>
         </div>
       ) : (

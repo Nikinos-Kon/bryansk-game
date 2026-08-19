@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
@@ -19,6 +19,7 @@ import { WalletModal } from './components/WalletModal';
 import { SettingsModal } from './components/SettingsModal';
 import { AuthModal } from './components/AuthModal';
 import { CartDrawer } from './components/CartDrawer';
+import { SupportModal } from './components/SupportModal';
 
 export function App() {
   const { user } = useAuth();
@@ -27,6 +28,16 @@ export function App() {
   const [activePage, setActivePage] = useState('store');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Automatically return to catalog when logged out or when unauthorized on admin page
+  useEffect(() => {
+    if (!user && activePage !== 'store') {
+      setActivePage('store');
+    }
+    if (user && activePage === 'admin' && user.role !== 'ADMIN' && user.role !== 'PUBLISHER') {
+      setActivePage('store');
+    }
+  }, [user]);
+
   // Modals state
   const [selectedGameModal, setSelectedGameModal] = useState(null);
   const [checkoutItems, setCheckoutItems] = useState(null);
@@ -34,6 +45,7 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   const handleSelectGame = (game) => {
     setSelectedGameModal(game);
@@ -111,6 +123,7 @@ export function App() {
             else setIsWalletOpen(true);
           }}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenSupport={() => setIsSupportOpen(true)}
         />
 
         {/* Dynamic Page Content */}
@@ -154,6 +167,10 @@ export function App() {
         onClose={() => setIsCartOpen(false)}
         onProceedCheckout={handleProceedCheckoutFromCart}
       />
+
+      {isSupportOpen && (
+        <SupportModal onClose={() => setIsSupportOpen(false)} />
+      )}
 
       {/* Floating Notifications */}
       <ToastContainer />
