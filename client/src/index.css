@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* THEME: DARK (Default) */
+  --bg-main: #0d1117;
+  --bg-surface: #161b22;
+  --bg-card: #21262d;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-accent: #ef4444;
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --glow-primary: rgba(59, 130, 246, 0.4);
+  --sidebar-bg: #11151c;
+}
+
+/* THEME: LIGHT (White, like Reference 1) */
+[data-theme="light"] {
+  --bg-main: #f3f4f6;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --border-color: #e5e7eb;
+  --color-primary: #e11d48;
+  --color-primary-hover: #be123c;
+  --color-accent: #e11d48;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --glow-primary: rgba(225, 29, 72, 0.25);
+  --sidebar-bg: #ffffff;
+}
+
+/* THEME: RED (Crimson Gaming) */
+[data-theme="red"] {
+  --bg-main: #140507;
+  --bg-surface: #220a0e;
+  --bg-card: #300f14;
+  --border-color: rgba(239, 68, 68, 0.2);
+  --color-primary: #ef4444;
+  --color-primary-hover: #dc2626;
+  --color-accent: #f87171;
+  --text-main: #fef2f2;
+  --text-muted: #fca5a5;
+  --glow-primary: rgba(239, 68, 68, 0.45);
+  --sidebar-bg: #1a070a;
+}
+
+/* THEME: PURPLE (Cyberpunk Neon Violet, like Reference 2) */
+[data-theme="purple"] {
+  --bg-main: #160d27;
+  --bg-surface: #24143d;
+  --bg-card: #311c52;
+  --border-color: rgba(168, 85, 247, 0.25);
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #7c3aed;
+  --color-accent: #ec4899;
+  --text-main: #f5f3ff;
+  --text-muted: #c4b5fd;
+  --glow-primary: rgba(139, 92, 246, 0.45);
+  --sidebar-bg: #1c0f33;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* 3D Forward Protrusion Game Card */
+.game-card-hover {
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              box-shadow 0.35s ease, 
+              border-color 0.35s ease;
+  transform-origin: center bottom;
+}
+
+.game-card-hover:hover {
+  transform: translateY(-8px) scale(1.035);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.7), 0 0 25px 0 var(--glow-primary);
+  z-index: 20;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}
+
+.glass-dropdown {
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+}

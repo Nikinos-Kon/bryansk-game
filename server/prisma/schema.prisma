@@ -1,0 +1,142 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  nickname      String
+  avatar        String?
+  role          String         @default("USER") // USER, ADMIN, PUBLISHER
+  bio           String?        @default("Геймер из Брянска")
+  level         Int            @default(1)
+  walletBalance Float          @default(5000.0) // initial balance in RUB
+  currency      String         @default("RUB")
+  theme         String         @default("dark") // dark, light, red, purple
+  lang          String         @default("ru")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  library       LibraryItem[]
+  cartItems     CartItem[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  transactions  Transaction[]
+}
+
+model Game {
+  id                 String         @id @default(uuid())
+  title              String
+  slug               String         @unique
+  descriptionRu      String
+  descriptionEn      String
+  shortDescRu        String?
+  shortDescEn        String?
+  priceRub           Float
+  priceUsd           Float
+  discountPercent    Int            @default(0)
+  isFeatured         Boolean        @default(false)
+  isSpecialOffer     Boolean        @default(false)
+  isNewRelease       Boolean        @default(true)
+  releaseDate        String
+  developer          String
+  publisher          String
+  rating             Float          @default(4.8)
+  ratingCount        Int            @default(120)
+  coverImage         String
+  headerBanner       String
+  screenshots        String         // JSON array of strings
+  trailerUrl         String?
+  categories         String         // JSON array of strings: ["Action", "RPG"]
+  tags               String         // JSON array of strings: ["Открытый мир", "Кооператив"]
+  systemRequirements String         // JSON object { min: {...}, rec: {...} }
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  libraryItems       LibraryItem[]
+  cartItems          CartItem[]
+  reviews            Review[]
+  wishlistItems      WishlistItem[]
+}
+
+model LibraryItem {
+  id           String   @id @default(uuid())
+  userId       String
+  gameId       String
+  purchaseDate DateTime @default(now())
+  playtimeMin  Int      @default(0)
+  isInstalled  Boolean  @default(false)
+  achievements String   @default("[]") // JSON array
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  gameId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  gameId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  gameId    String
+  rating    Int      // 1 to 5
+  isPositive Boolean @default(true)
+  content   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  userId        String
+  type          String   // PURCHASE, TOPUP
+  paymentMethod String   // SBP, VISA_MC, USDT, WALLET
+  amountRub     Float
+  amountUsd     Float
+  status        String   // COMPLETED, PENDING, FAILED
+  details       String?  // JSON with items or note
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userId1   String
+  userId2   String
+  status    String   @default("ACCEPTED") // PENDING, ACCEPTED, BLOCKED
+  createdAt DateTime @default(now())
+
+  @@unique([userId1, userId2])
+}

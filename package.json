@@ -1,0 +1,15 @@
+{
+  "name": "bryansk-game-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bryansk_game - Платформа цифровой дистрибуции компьютерных игр (Full-Stack Steam Clone)",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "start": "node server/src/index.js"
+  },
+  "keywords": ["game-store", "steam-clone", "bryansk-game"],
+  "author": "Antigravity AI & Nikita",
+  "license": "ISC"
+}
