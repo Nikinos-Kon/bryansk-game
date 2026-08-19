@@ -17,7 +17,7 @@ try {
     PRAGMA foreign_keys = ON;
   `);
 } catch (e) {
-  // Ignore if pragma unsupported
+  // Ignore
 }
 
 export function initDatabase() {
@@ -140,53 +140,69 @@ export function initDatabase() {
     );
   `);
 
-  // Seed default games if table is empty
-  const countGames = db.prepare('SELECT COUNT(*) as count FROM games').get().count;
-  if (countGames === 0) {
-    console.log('Seeding default games catalog...');
-    const insertGame = db.prepare(`
-      INSERT INTO games (
-        id, title, slug, descriptionRu, descriptionEn, shortDescRu, shortDescEn,
-        priceRub, priceUsd, discountPercent, isFeatured, isSpecialOffer, isNewRelease,
-        releaseDate, developer, publisher, rating, ratingCount, coverImage, headerBanner,
-        screenshots, trailerUrl, categories, tags, systemRequirements
-      ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?
-      )
-    `);
+  // Always sync/upsert games catalog with full official Steam games data
+  console.log(`Syncing ${SEED_GAMES.length} real games with official Steam artwork...`);
+  const upsertGame = db.prepare(`
+    INSERT INTO games (
+      id, title, slug, descriptionRu, descriptionEn, shortDescRu, shortDescEn,
+      priceRub, priceUsd, discountPercent, isFeatured, isSpecialOffer, isNewRelease,
+      releaseDate, developer, publisher, rating, ratingCount, coverImage, headerBanner,
+      screenshots, trailerUrl, categories, tags, systemRequirements
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?
+    )
+    ON CONFLICT(id) DO UPDATE SET
+      title = excluded.title,
+      descriptionRu = excluded.descriptionRu,
+      descriptionEn = excluded.descriptionEn,
+      shortDescRu = excluded.shortDescRu,
+      shortDescEn = excluded.shortDescEn,
+      priceRub = excluded.priceRub,
+      priceUsd = excluded.priceUsd,
+      discountPercent = excluded.discountPercent,
+      isFeatured = excluded.isFeatured,
+      isSpecialOffer = excluded.isSpecialOffer,
+      isNewRelease = excluded.isNewRelease,
+      coverImage = excluded.coverImage,
+      headerBanner = excluded.headerBanner,
+      screenshots = excluded.screenshots,
+      trailerUrl = excluded.trailerUrl,
+      categories = excluded.categories,
+      tags = excluded.tags,
+      systemRequirements = excluded.systemRequirements
+  `);
 
-    for (const game of SEED_GAMES) {
-      insertGame.run(
-        game.id,
-        game.title,
-        game.slug,
-        game.descriptionRu,
-        game.descriptionEn,
-        game.shortDescRu || '',
-        game.shortDescEn || '',
-        game.priceRub,
-        game.priceUsd,
-        game.discountPercent || 0,
-        game.isFeatured ? 1 : 0,
-        game.isSpecialOffer ? 1 : 0,
-        game.isNewRelease ? 1 : 0,
-        game.releaseDate,
-        game.developer,
-        game.publisher,
-        game.rating,
-        game.ratingCount,
-        game.coverImage,
-        game.headerBanner,
-        game.screenshots,
-        game.trailerUrl || '',
-        game.categories,
-        game.tags,
-        game.systemRequirements
-      );
-    }
+  for (const game of SEED_GAMES) {
+    upsertGame.run(
+      game.id,
+      game.title,
+      game.slug,
+      game.descriptionRu,
+      game.descriptionEn,
+      game.shortDescRu || '',
+      game.shortDescEn || '',
+      game.priceRub,
+      game.priceUsd,
+      game.discountPercent || 0,
+      game.isFeatured ? 1 : 0,
+      game.isSpecialOffer ? 1 : 0,
+      game.isNewRelease ? 1 : 0,
+      game.releaseDate,
+      game.developer,
+      game.publisher,
+      game.rating,
+      game.ratingCount,
+      game.coverImage,
+      game.headerBanner,
+      game.screenshots,
+      game.trailerUrl || '',
+      game.categories,
+      game.tags,
+      game.systemRequirements
+    );
   }
 
   // Seed default users if empty
@@ -216,17 +232,21 @@ export function initDatabase() {
       );
     }
 
-    // Give gamer account 2 purchased games in library
+    // Give gamer account purchased games in library
     const insertLib = db.prepare(`
       INSERT OR IGNORE INTO library_items (id, userId, gameId, playtimeMin, isInstalled, achievements)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
-    insertLib.run('lib-1', 'user-gamer', 'game-valorant-tactics', 340, 1, JSON.stringify([
-      { id: 'ach-1', title: 'Первая кровь', description: 'Совершите первое убийство в раунде', unlockedAt: '2024-03-01' },
-      { id: 'ach-2', title: 'Хедшотер', description: 'Поразите 50 врагов в голову', unlockedAt: '2024-03-05' }
+    insertLib.run('lib-1', 'user-gamer', 'game-cyberpunk-2077', 1280, 1, JSON.stringify([
+      { id: 'ach-1', title: 'Легенда Посмертия', description: 'Завершите все заказы фиксеров в Найт-Сити', unlockedAt: '2024-04-10' },
+      { id: 'ach-2', title: 'Киберпсихоз', description: 'Обезвредьте всех киберпсихопатов', unlockedAt: '2024-04-15' }
     ]));
-    insertLib.run('lib-2', 'user-gamer', 'game-cyberpunk-2077', 1280, 1, JSON.stringify([
-      { id: 'ach-3', title: 'Легенда Посмертия', description: 'Завершите все заказы фиксеров', unlockedAt: '2024-04-10' }
+    insertLib.run('lib-2', 'user-gamer', 'game-cs2', 3450, 1, JSON.stringify([
+      { id: 'ach-3', title: 'Первая кровь', description: 'Совершите первое убийство в раунде', unlockedAt: '2024-03-01' },
+      { id: 'ach-4', title: 'Хедшотер', description: 'Поразите 500 врагов в голову', unlockedAt: '2024-03-05' }
+    ]));
+    insertLib.run('lib-3', 'user-gamer', 'game-rdr2', 2100, 1, JSON.stringify([
+      { id: 'ach-5', title: 'Золотая лихорадка', description: 'Получите 70 золотых медалей в сюжетных заданиях', unlockedAt: '2024-05-20' }
     ]));
 
     // Seed default reviews
@@ -236,5 +256,6 @@ export function initDatabase() {
     `);
     insertReview.run('rev-1', 'user-gamer', 'game-cyberpunk-2077', 5, 1, 'Шедевр после всех патчей и Phantom Liberty! Графика и сюжет на высоте.');
     insertReview.run('rev-2', 'user-admin', 'game-baldurs-gate-3', 5, 1, '10 из 10, лучшая ролевая игра десятилетия. Прошел за 150 часов.');
+    insertReview.run('rev-3', 'user-gamer', 'game-rdr2', 5, 1, 'Лучший открытый мир и невероятно трогательная история Артура Моргана.');
   }
 }

@@ -11,7 +11,8 @@ import {
   ShoppingCart, 
   Check, 
   Eye, 
-  Gamepad2
+  Gamepad2,
+  Sparkles
 } from 'lucide-react';
 
 export function GameCard({ game, onSelectGame }) {
@@ -63,24 +64,24 @@ export function GameCard({ game, onSelectGame }) {
   return (
     <div
       onClick={() => onSelectGame(game)}
-      className="game-card-hover group relative flex flex-col rounded-2xl bg-theme-card border border-theme-border overflow-hidden cursor-pointer shadow-md select-none transition-all duration-300"
+      className="game-card-hover group relative flex flex-col rounded-3xl bg-theme-card border border-theme-border overflow-hidden cursor-pointer shadow-lg select-none transition-all duration-300"
     >
       
-      {/* Cover Image Container */}
-      <div className="relative w-full aspect-[16/10] overflow-hidden bg-theme-surface">
+      {/* Official Steam Cover Poster */}
+      <div className="relative w-full aspect-[3/4] overflow-hidden bg-theme-surface">
         <img
           src={game.coverImage}
           alt={game.title}
-          className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-theme-card via-transparent to-black/30 opacity-80 group-hover:opacity-95 transition-opacity" />
+        {/* Dynamic Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-theme-card via-transparent to-black/40 opacity-80 group-hover:opacity-90 transition-opacity" />
 
         {/* Rating Badge (Top Left) */}
-        <div className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-amber-400 text-[11px] font-black">
-          <Star size={11} className="fill-amber-400" />
+        <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/10 text-amber-400 text-xs font-black shadow-md">
+          <Star size={12} className="fill-amber-400" />
           <span>{game.rating}</span>
         </div>
 
@@ -88,9 +89,9 @@ export function GameCard({ game, onSelectGame }) {
         <button
           onClick={handleWishlistToggle}
           disabled={wishlistLoading}
-          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
             isWishlisted
-              ? 'bg-rose-500 text-white border-rose-400 shadow-lg scale-105'
+              ? 'bg-rose-500 text-white border-rose-400 shadow-lg scale-110'
               : 'bg-black/50 text-white/80 border-white/10 hover:bg-rose-500 hover:text-white'
           }`}
           title={t('wishlist')}
@@ -98,18 +99,18 @@ export function GameCard({ game, onSelectGame }) {
           <Heart size={14} className={isWishlisted ? 'fill-white' : ''} />
         </button>
 
-        {/* Quick Preview Hover Overlay */}
+        {/* Quick View Button on Hover */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
-          <span className="px-3.5 py-1.5 rounded-full bg-theme-primary text-white text-xs font-bold shadow-glow-primary flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+          <span className="px-4 py-2 rounded-full bg-gradient-to-r from-theme-primary to-theme-primary-hover text-white text-xs font-black shadow-glow-primary flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <Eye size={14} />
             <span>Подробнее</span>
           </span>
         </div>
 
-        {/* Owned Badge */}
+        {/* In Library Badge */}
         {game.isOwned && (
-          <div className="absolute bottom-2 left-2.5 px-2 py-0.5 rounded-md bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-md">
-            <Check size={11} />
+          <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-xl bg-emerald-500 text-white text-[10px] font-black tracking-wider uppercase flex items-center gap-1 shadow-lg backdrop-blur-md">
+            <Check size={12} />
             <span>{t('inLibrary')}</span>
           </div>
         )}
@@ -119,33 +120,33 @@ export function GameCard({ game, onSelectGame }) {
       <div className="p-4 flex-1 flex flex-col justify-between gap-3">
         
         <div>
-          {/* Categories / Genre */}
+          {/* Categories */}
           <div className="flex items-center gap-1.5 overflow-hidden">
             {game.categories?.slice(0, 2).map((cat) => (
-              <span key={cat} className="text-[10px] font-bold text-theme-muted uppercase tracking-wider">
+              <span key={cat} className="text-[10px] font-black text-theme-muted uppercase tracking-wider">
                 {cat}
               </span>
             ))}
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-sm text-theme-text group-hover:text-theme-primary transition-colors line-clamp-1 mt-0.5">
+          <h3 className="font-extrabold text-sm text-theme-text group-hover:text-theme-primary transition-colors line-clamp-1 mt-0.5">
             {game.title}
           </h3>
         </div>
 
         {/* Price & Cart Actions Row */}
-        <div className="flex items-center justify-between pt-2 border-t border-theme-border/60">
+        <div className="flex items-center justify-between pt-2.5 border-t border-theme-border/60">
           
           {/* Price Block */}
           <div className="flex items-center gap-1.5">
             {discount > 0 ? (
               <>
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] border border-emerald-500/30">
+                <span className="px-1.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-black text-[11px] border border-emerald-500/30">
                   -{discount}%
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-theme-muted line-through font-semibold leading-none">
+                  <span className="text-[10px] text-theme-muted line-through font-bold leading-none">
                     {formatPrice(game.priceRub, game.priceUsd)}
                   </span>
                   <span className="text-sm font-black text-theme-text mt-0.5">
@@ -164,7 +165,7 @@ export function GameCard({ game, onSelectGame }) {
           {!game.isOwned && (
             <button
               onClick={handleAddToCart}
-              className="p-2 rounded-xl bg-theme-surface hover:bg-theme-primary hover:text-white border border-theme-border text-theme-text transition-all duration-200 shadow-sm"
+              className="p-2 rounded-xl bg-theme-surface hover:bg-theme-primary hover:text-white border border-theme-border text-theme-text transition-all duration-200 shadow-sm active:scale-95"
               title={t('addToCart')}
             >
               <ShoppingCart size={15} />
